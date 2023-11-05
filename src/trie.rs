@@ -41,6 +41,7 @@ pub trait Trie<D: DB> {
     // TODO refactor encode_raw() so that it doesn't need a &mut self
     fn get_proof(&mut self, key: &[u8]) -> TrieResult<Vec<Vec<u8>>>;
 
+    fn get_proof_nodes(&mut self, key: &[u8]) -> TrieResult<Vec<Node>>;
     /// return value if key exists, None if key not exist, Error if proof is wrong
     fn verify_proof(
         &self,
@@ -247,6 +248,32 @@ where
             db: self.db.clone(),
         }
     }
+    fn internal_get_proof(&mut self, key: &[u8]) -> TrieResult<Vec<Node>> {
+        let key_path = &Nibbles::from_raw(key, true);
+        let result = self.get_path_at(&self.root, key_path, 0);
+
+        if let Err(TrieError::MissingTrieNode {
+            node_hash,
+            traversed,
+            root_hash,
+            err_key: _,
+        }) = result
+        {
+            Err(TrieError::MissingTrieNode {
+                node_hash,
+                traversed,
+                root_hash,
+                err_key: Some(key.to_vec()),
+            })
+        } else {
+            let mut path = result?;
+            match self.root {
+                Node::Empty => {}
+                _ => path.push(self.root.clone()),
+            }
+            Ok(path.into_iter().rev().collect())
+        }
+    }
 }
 
 impl<D> Trie<D> for EthTrie<D>
@@ -341,6 +368,10 @@ where
         self.commit()
     }
 
+    fn get_proof_nodes(&mut self, key: &[u8]) -> TrieResult<Vec<Node>> {
+        self.internal_get_proof(key)
+    }
+
     /// Prove constructs a merkle proof for key. The result contains all encoded nodes
     /// on the path to the value at key. The value itself is also included in the last
     /// node and can be retrieved by verifying the proof.
@@ -349,34 +380,8 @@ where
     /// nodes of the longest existing prefix of the key (at least the root node), ending
     /// with the node that proves the absence of the key.
     fn get_proof(&mut self, key: &[u8]) -> TrieResult<Vec<Vec<u8>>> {
-        let key_path = &Nibbles::from_raw(key, true);
-        let result = self.get_path_at(&self.root, key_path, 0);
-
-        if let Err(TrieError::MissingTrieNode {
-            node_hash,
-            traversed,
-            root_hash,
-            err_key: _,
-        }) = result
-        {
-            Err(TrieError::MissingTrieNode {
-                node_hash,
-                traversed,
-                root_hash,
-                err_key: Some(key.to_vec()),
-            })
-        } else {
-            let mut path = result?;
-            match self.root {
-                Node::Empty => {}
-                _ => path.push(self.root.clone()),
-            }
-            Ok(path
-                .into_iter()
-                .rev()
-                .map(|n| self.encode_raw(&n))
-                .collect())
-        }
+        self.internal_get_proof(key)
+            .map(|nodes| nodes.into_iter().map(|n| self.encode_raw(&n)).collect())
     }
 
     /// return value if key exists, None if key not exist, Error if proof is wrong
