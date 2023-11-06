@@ -9,6 +9,8 @@ mod trie;
 pub use db::{MemoryDB, DB};
 pub use errors::{MemDBError, TrieError};
 pub use trie::{EthTrie, Trie};
+pub use node::Node;
+pub use nibbles::Nibbles;
 
 #[doc = include_str!("../README.md")]
 #[cfg(doctest)]
