@@ -41,7 +41,6 @@ impl Nibbles {
             0x1 => hex.push(flag % 16),
             0x2 => {
                 is_leaf = true;
-                println!(" +++ simple leaf case");
             }
             0x3 => {
                 is_leaf = true;
@@ -50,11 +49,6 @@ impl Nibbles {
             _ => panic!("invalid data"),
         }
 
-        println!(
-            " ++++ to decode in hex len {} (hex.len() now {})",
-            compact[1..].len(),
-            hex.len()
-        );
         for item in &compact[1..] {
             hex.push(item / 16);
             hex.push(item % 16);
