@@ -13,15 +13,9 @@ impl Nibbles {
     }
     pub fn nibbles(&self) -> &[u8] {
         if self.is_leaf() {
-<<<<<<< HEAD
             &self.hex_data[0..self.hex_data.len() - 1]
         } else {
             &self.hex_data[0..]
-=======
-            &self.hex_data[..self.hex_data.len() - 1]
-        } else {
-            &self.hex_data[..]
->>>>>>> 00ef8e1002dd7bb862124f4f90f29b3c07d6a2a8
         }
     }
 
