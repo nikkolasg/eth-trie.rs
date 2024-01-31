@@ -11,6 +11,8 @@ pub use errors::{MemDBError, TrieError};
 pub use nibbles::Nibbles;
 pub use node::Node;
 pub use trie::{EthTrie, Trie};
+pub use node::Node;
+pub use nibbles::Nibbles;
 
 #[doc = include_str!("../README.md")]
 #[cfg(doctest)]

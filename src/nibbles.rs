@@ -13,9 +13,15 @@ impl Nibbles {
     }
     pub fn nibbles(&self) -> &[u8] {
         if self.is_leaf() {
+<<<<<<< HEAD
             &self.hex_data[0..self.hex_data.len() - 1]
         } else {
             &self.hex_data[0..]
+=======
+            &self.hex_data[..self.hex_data.len() - 1]
+        } else {
+            &self.hex_data[..]
+>>>>>>> 00ef8e1002dd7bb862124f4f90f29b3c07d6a2a8
         }
     }
 
@@ -39,7 +45,10 @@ impl Nibbles {
         match flag >> 4 {
             0x0 => {}
             0x1 => hex.push(flag % 16),
-            0x2 => is_leaf = true,
+            0x2 => {
+                is_leaf = true;
+                println!(" +++ simple leaf case");
+            }
             0x3 => {
                 is_leaf = true;
                 hex.push(flag % 16);
@@ -47,6 +56,11 @@ impl Nibbles {
             _ => panic!("invalid data"),
         }
 
+        println!(
+            " ++++ to decode in hex len {} (hex.len() now {})",
+            compact[1..].len(),
+            hex.len()
+        );
         for item in &compact[1..] {
             hex.push(item / 16);
             hex.push(item % 16);
