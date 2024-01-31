@@ -11,6 +11,13 @@ impl Nibbles {
             hex_data: hex.to_vec(),
         }
     }
+    pub fn nibbles(&self) -> &[u8] {
+        if self.is_leaf() {
+            &self.hex_data[0..self.hex_data.len() - 1]
+        } else {
+            &self.hex_data[0..]
+        }
+    }
 
     pub fn from_raw(raw: &[u8], is_leaf: bool) -> Self {
         let mut hex_data = vec![];

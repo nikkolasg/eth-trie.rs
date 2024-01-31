@@ -826,7 +826,7 @@ where
         }
     }
 
-    fn encode_raw(&mut self, node: &Node) -> Vec<u8> {
+    pub fn encode_raw(&mut self, node: &Node) -> Vec<u8> {
         match node {
             Node::Empty => rlp::NULL_RLP.to_vec(),
             Node::Leaf(leaf) => {
