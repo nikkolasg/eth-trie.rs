@@ -915,7 +915,7 @@ where
         }
     }
 
-    fn recover_from_db(&self, key: H256) -> TrieResult<Option<Node>> {
+    pub fn recover_from_db(&self, key: H256) -> TrieResult<Option<Node>> {
         let node = match self
             .db
             .get(key.as_bytes())
